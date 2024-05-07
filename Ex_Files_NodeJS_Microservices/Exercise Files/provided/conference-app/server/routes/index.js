@@ -8,6 +8,16 @@ const feedbackRoute = require('./feedback');
 module.exports = (param) => {
   const { speakers } = param;
 
+  router.get('/images/:type/:file', async (req, res, next) => {
+    try {
+      const { type, file } = req.params;
+      const image = await speakers.getImage(`${type}/${file}`);
+      return image.pipe(res);
+    } catch (error) {
+      return next(error);
+    }
+  })
+
   router.get('/', async (req, res, next) => {
     try {
       const promises = [];

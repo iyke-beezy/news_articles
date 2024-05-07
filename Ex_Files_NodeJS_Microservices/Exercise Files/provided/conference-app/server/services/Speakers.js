@@ -1,20 +1,23 @@
 /* eslint-disable class-methods-use-this */
 const { default: axios } = require("axios");
 
+const CircuitBreaker = require('../lib/CircuitBreaker');
+const circuitbreaker = new CircuitBreaker();
+
 class SpeakersService {
-	constructor({serviceRegistryUrl, serviceVersionIdentifier}) {
+	constructor({ serviceRegistryUrl, serviceVersionIdentifier }) {
 		this.serviceRegistryUrl = serviceRegistryUrl;
-    this.serviceVersionIdentifier = serviceVersionIdentifier;
+		this.serviceVersionIdentifier = serviceVersionIdentifier;
 	}
 
-  async getImages (path) {
-    const { ip, port } = await this.getService("speakers-service");
+	async getImage(path) {
+		const { ip, port } = await this.getService("speakers-service");
 		return this.callService({
 			method: "get",
-      responseType: 'stream',
+			responseType: 'stream',
 			url: `http://${ip}:${port}/images/${path}`,
 		});
-  }
+	}
 
 	async getNames() {
 		const { ip, port } = await this.getService("speakers-service");
@@ -72,8 +75,7 @@ class SpeakersService {
 	}
 
 	async callService(serviceoptions) {
-		const response = await axios(serviceoptions);
-		return response.data;
+		return circuitbreaker.callService(serviceoptions)
 	}
 }
 
